@@ -1,8 +1,7 @@
-import React from "react"
-import { useAuth } from "../../context/AuthContext"
+// import React from "react"
+// import { useAuth } from "../../context/AuthContext"
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Header from "../../components/Header";
 
 
 const pageTransitionVariants = {

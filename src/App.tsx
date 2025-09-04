@@ -15,7 +15,8 @@ import { DashboardRouter } from "./pages/Dashboard/DashboardRouter";
 // Importe suas páginas de funcionalidade comum (elas ainda serão usadas como sub-rotas)
 import AppointmentsList from "./pages/Appointments/Appointments";
 // import CalendarPage from "./pages/Calendar/CalendarPage";
-// import ClientsPage from "./pages/Clients/ClientsPage";
+// import ClientsPage from "./pages/Clients/ClientsPage";a
+import Support from "./pages/Support/Suporte";
 
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -41,6 +42,9 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<Login />} />
+
+        {/* Adicionando a rota de Suporte fora do ProtectedRoute */}
+        <Route path="/suporte" element={<Support />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />}>

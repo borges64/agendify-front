@@ -40,3 +40,23 @@ export interface AuthContextType {
   login: (credentials: LoginPayload) => Promise<void>; // Função para logar (recebe credenciais)
   logout: () => void; // Função para deslogar
 }
+
+export interface User {
+  id: string;
+  name: string;
+  phone: string;
+  type: 'ADMIN' | 'PATIENT';
+  isActive: boolean;
+  updatedAt: string;
+  lastLoginAt: string | null;
+  email: string;
+}
+
+// src/types/adminData.ts
+export interface AdminData {
+  message: string;
+  userType: 'ADMIN';
+  allUsers: User[];
+}
+
+export type EditableUser = Partial<User>;
