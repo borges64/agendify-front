@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -26,11 +28,16 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      {/* Container principal com o fundo pastel */}
-      <div className="relative p-8 rounded-lg shadow-xl w-full max-w-md bg-gradient-to-br from-pastel-light to-yellow-100/75 transform transition-all duration-500 hover:scale-105">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <motion.div
+        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Agendify Login</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Campo de Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
@@ -42,10 +49,11 @@ export const Login: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-300 hover:border-gray-400"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm transition-colors duration-300 hover:border-gray-400"
               placeholder="seuemail@exemplo.com"
             />
           </div>
+          {/* Campo de Senha */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Senha
@@ -57,27 +65,44 @@ export const Login: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-300 hover:border-gray-400"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm transition-colors duration-300 hover:border-gray-400"
               placeholder="********"
             />
           </div>
+          {/* Exibição de Erro */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative flex items-center justify-between"
+            >
+              <span className="block sm:inline text-sm">{error}</span>
+              <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
+          {/* Botão de Envio */}
           <button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-pastel-dark hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300"
+            disabled={isLoading}
+            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white transition-colors duration-300 ${
+              isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600'
+            }`}
           >
-            Entrar
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
           Não tem uma conta?{' '}
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a href="/register" className="font-medium text-gray-800 hover:text-gray-900 ml-1">
             Cadastre-se
           </a>
         </p>
         <p className='mt-4 text-center text-sm text-gray-400'>
-          <a href="#" className='font-medium text-purple-600 hover:text-indigo-500'>Esqueceu a senha?</a>
+          <a href="#" className='font-medium text-gray-800 hover:text-gray-900'>Esqueceu a senha?</a>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

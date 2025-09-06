@@ -41,6 +41,14 @@ export interface AuthContextType {
   logout: () => void; // Função para deslogar
 }
 
+export interface UserCreate {
+  name: string,
+  phone: string, 
+  email: string,
+  password: string,
+  isActive: boolean
+}
+
 export interface User {
   id: string;
   name: string;

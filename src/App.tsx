@@ -3,24 +3,22 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { Login } from "./pages/Auth/login/login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Dashboard } from "./pages/Dashboard/DashboardLayout"; // Seu DashboardLayout
+import { Dashboard } from "./pages/Dashboard/DashboardLayout";
 import NotFoundPage from "./pages/NotFound";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { UserType } from "./utils/allInterfaces"; // Importe o enum UserType
-
-// Importe o novo DashboardRouter
+import { UserType } from "./utils/allInterfaces";
 import { DashboardRouter } from "./pages/Dashboard/DashboardRouter";
-
-// Importe suas páginas de funcionalidade comum (elas ainda serão usadas como sub-rotas)
 import AppointmentsList from "./pages/Appointments/Appointments";
-// import CalendarPage from "./pages/Calendar/CalendarPage";
-// import ClientsPage from "./pages/Clients/ClientsPage";a
 import Support from "./pages/Support/Suporte";
+import { NotificationProvider } from "./components/NotifyComponent/notifcationContext";
+import { Register } from "./pages/Register/Register";
+
+// Importe o NotificationProvider
 
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
-  console.log(user)
+  console.log(user);
   const location = useLocation();
 
   const shouldShowHeaderAndFooter =
@@ -38,64 +36,57 @@ function App() {
 
   return (
     <>
-      {shouldShowHeaderAndFooter && <Header />}
+      {/* Envolve o header, as rotas e o footer com o provedor de notificação */}
+      <NotificationProvider>
+        {shouldShowHeaderAndFooter && <Header />}
 
-      <Routes>
-        <Route path="/login" element={<Login />} />
+        <Routes>
+          {/* PAGINAS SEM PROTEÇÃO */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/suporte" element={<Support />} />
+          <Route path="/register" element={<Register/> } />
 
-        {/* Adicionando a rota de Suporte fora do ProtectedRoute */}
-        <Route path="/suporte" element={<Support />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />}>
+              <Route index element={<DashboardRouter />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />}>
-            {/* ALTERADO: Apenas uma Route index que aponta para o DashboardRouter */}
-            <Route index element={<DashboardRouter />} />
+              {(user?.type === UserType.ADMIN || user?.type === UserType.EMPLOYEE) && (
+                <>
+                  <Route path="agendamentos" element={<AppointmentsList />} />
+                </>
+              )}
 
-            {/* Rotas Comuns para Admin e Employee */}
-            {(user?.type === UserType.ADMIN || user?.type === UserType.EMPLOYEE) && (
-              <>
-                <Route path="agendamentos" element={<AppointmentsList />} />
-                {/* <Route path="calendario" element={<CalendarPage />} />
-                <Route path="clientes" element={<ClientsPage />} /> */}
-              </>
-            )}
+              {user?.type === UserType.ADMIN && (
+                <>
+                </>
+              )}
 
-            {/* Rotas Específicas do Admin (se houver e não forem a index) */}
-            {user?.type === UserType.ADMIN && (
-              <>
-                {/* Exemplo: <Route path="gerenciar-usuarios" element={<ManageUsersPage />} /> */}
-              </>
-            )}
+              {user?.type === UserType.PATIENT && (
+                <>
+                </>
+              )}
 
-            {/* Rotas Específicas do Paciente (se houver e não forem a index) */}
-            {user?.type === UserType.PATIENT && (
-              <>
-                {/* Exemplo: <Route path="meus-agendamentos" element={<PatientAppointmentsPage />} /> */}
-              </>
-            )}
+              <Route path="*" element={<Navigate to="/404" replace />} />
+            </Route>
 
-            {/* Fallback para tipos de usuário não tratados ou caminhos inválidos dentro de /dashboard */}
-            <Route path="*" element={<Navigate to="/404" replace />} />
           </Route>
 
-          {/* Outras rotas protegidas que não usam o DashboardLayout (se houver) */}
-        </Route>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
 
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-
-      {shouldShowHeaderAndFooter && <Footer />}
+        {shouldShowHeaderAndFooter && <Footer />}
+      </NotificationProvider>
     </>
   );
 }
