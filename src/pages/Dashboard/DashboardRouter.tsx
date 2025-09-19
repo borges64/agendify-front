@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext'; // Ajuste o caminho conforme necessário
 import { UserType } from '../../utils/allInterfaces'; // Ajuste o caminho conforme necessário
-import { AdminDashboardPage } from './DashboardAdmin';
+import { AdminDashboardPage } from './Admin-painel/DashboardAdmin';
 import { EmployeeDashboardPage } from './DashboardEmployee';
 import { PatientDashboardPage } from './DashboardPatient';
 

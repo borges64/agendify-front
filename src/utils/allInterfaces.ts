@@ -39,6 +39,7 @@ export interface AuthContextType {
   loading: boolean; // Indica se o estado de autenticação está sendo carregado (inicialmente)
   login: (credentials: LoginPayload) => Promise<void>; // Função para logar (recebe credenciais)
   logout: () => void; // Função para deslogar
+  refreshUser: (updateUser?: User) => Promise<void>;
 }
 
 export interface UserCreate {

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import axios, { AxiosError } from 'axios';
-import { AdminData, User, EditableUser } from '../../utils/allInterfaces';
-import { ChevronDown, Search, X } from 'lucide-react';
-import { UserType } from '../../utils/allInterfaces';
+import { AdminData, User, EditableUser } from '../../../utils/allInterfaces';
+import { ChevronDown, ChevronLeft, ChevronRight, Search, Settings, X } from 'lucide-react';
+import { UserType } from '../../../utils/allInterfaces';
 import { motion } from 'framer-motion';
-import { useNotifications } from '../../components/NotifyComponent/notifcationContext';
+import { useNotifications } from '../../../components/NotifyComponent/notifcationContext';
+import { div } from 'framer-motion/client';
 
 // Componente para exibir o formulário de edição em um modal
 const EditUserModal: React.FC<{
@@ -141,6 +142,8 @@ export const AdminDashboardPage: React.FC = () => {
     const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const { addNotification } = useNotifications()
+    const [currentPage, setCurrentPage] = useState(1)
+    const [usersPerPage, setUserPerPage] = useState(10)
 
     const fetchAdminData = async () => {
         if (!user || user.type !== UserType.ADMIN || !token) {
@@ -224,6 +227,17 @@ export const AdminDashboardPage: React.FC = () => {
         );
     }
 
+    const indexOfLastUser = currentPage * usersPerPage
+    const indexOfFirstUser = indexOfLastUser - usersPerPage
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
+    // MAP ALL NUMBERS PAGE
+    const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
+    const pageNumbers = []
+    for(let i = 1;i <= totalPages;i++) {
+      pageNumbers.push(i)
+    }
+    const paginate = (pageNumbers: number) => setCurrentPage(pageNumbers)
+
     return (
         <div className="min-h-screen bg-gray-50 text-gray-800 p-8">
             <div className="max-w-7xl mx-auto">
@@ -238,10 +252,18 @@ export const AdminDashboardPage: React.FC = () => {
                     .
                 </p>
 
+          
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100"><h3 className="text-sm font-medium text-gray-500 mb-2">Total de Usuários</h3><p className="text-3xl font-bold text-gray-900">{filteredUsers.length}</p></div>
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100"><h3 className="text-sm font-medium text-gray-500 mb-2">Usuários Ativos</h3><p className="text-3xl font-bold text-teal-600">{filteredUsers.filter(u => u.isActive).length}</p></div>
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100"><h3 className="text-sm font-medium text-gray-500 mb-2">Usuários Admin</h3><p className="text-3xl font-bold text-gray-900">{filteredUsers.filter(u => u.type === UserType.ADMIN).length}</p></div>
+                </div>
+
+                <div>
+                  <button>Cadastrar nova empresa</button>
+                  <button>cadastrar novo administrador</button>
+                  
                 </div>
 
                 <div className="p-8 bg-white rounded-xl shadow-lg border border-gray-100">
@@ -267,9 +289,10 @@ export const AdminDashboardPage: React.FC = () => {
                             </button>
                         )}
                     </div>
+                    
 
                     {filteredUsers.length > 0 ? (
-                        filteredUsers.map((u) => (
+                        currentUsers.map((u) => (
                             <UserListItem
                                 key={u.id}
                                 user={u}
@@ -280,6 +303,39 @@ export const AdminDashboardPage: React.FC = () => {
                         ))
                     ) : (
                         <p className="text-gray-500 text-center py-8">Nenhum usuário encontrado.</p>
+                    )}
+
+                    {/* Controles de Paginação */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center space-x-2 mt-8">
+                            <button
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            {pageNumbers.map(number => (
+                                <button
+                                    key={number}
+                                    onClick={() => paginate(number)}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                        currentPage === number
+                                            ? 'bg-teal-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>

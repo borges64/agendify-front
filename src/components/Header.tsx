@@ -6,9 +6,10 @@ import { Bell, Settings, User, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserType } from '../utils/allInterfaces';
 import { useNotifications } from './NotifyComponent/notifcationContext';
+import ConfigUserIcon_Dropdown from './ConfigUserIconComponent';
 
 // Define os tipos de menu que podem ser abertos
-type OpenMenu = 'notifications' | 'profile' | null;
+type OpenMenu = 'notifications' | 'profile' | 'settings' |null;
 
 // Componente para a lista de notificações em dropdown
 const NotificationsDropdown: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -187,9 +188,34 @@ const Header: React.FC = () => {
                                 </AnimatePresence>
                             </div>
 
-                            <motion.button className="p-2 rounded-full hover:bg-gray-100 transition-colors" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                <Settings className="h-5 w-5 text-gray-500" />
-                            </motion.button>
+                            <div>
+                                <motion.button 
+                                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                                    whileHover={{ scale: 1.1 }} 
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => setOpenMenu(openMenu === 'settings' ? null : 'settings')}
+                                >
+                                    <motion.div
+                                        whileHover={{
+                                            rotate: 360, 
+                                            transition: {
+                                                duration: 1,
+                                                repeat: Infinity, 
+                                                ease: "linear"
+                                            }
+                                        }}
+                                    >
+                                        <Settings className="h-5 w-5 text-gray-500" />
+                                    </motion.div>
+                                </motion.button>
+                                <AnimatePresence>
+                                    {openMenu === "settings" && <ConfigUserIcon_Dropdown onClose={() => setOpenMenu(null)}/>}
+                                </AnimatePresence>
+                            
+                            </div>
+
+                            
+                           
                             {user && (
                                 <div className="relative">
                                     <button

@@ -2,9 +2,10 @@ import React, { createContext, useState, useEffect, useCallback, useContext, Rea
 import { useNavigate } from 'react-router-dom';
 import { AuthContextType, AuthUser, LoginPayload } from '../utils/allInterfaces'; // Importa nossos tipos
 import { authService } from '../services/authService'; // Importa o serviço de autenticação
+import axios from 'axios';
 
 interface User {
-  id: string;
+  id: number;
   email: string;
   name: string;
   type: 'admin' | 'employee' | 'patient'; // ESSENCIAL: Garanta que o tipo esteja aqui
@@ -87,6 +88,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false); // Marca o carregamento inicial como completo
   }, []); // O array de dependências vazio significa que ele roda apenas uma vez no mount
 
+
+  const refreshUser = useCallback(async (updatedUser?: User) => {
+    try {
+      // Se um usuário atualizado for passado, usa-o
+      if (updatedUser) {
+        setUser(updatedUser);
+      } else {
+        // Caso contrário, busca os dados mais recentes do backend
+        const response = await axios.get('http://localhost:3000/auth/profile', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.error('Falha ao atualizar o usuário:', error);
+      // Se o token for inválido, faz logout
+      logout();
+    }
+  }, [token, setUser]);
+
   // 7. Valor do contexto que será provido para os componentes filhos
   const contextValue: AuthContextType = {
     user,
@@ -95,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     login,
     logout,
+    refreshUser
   };
 
   return (
